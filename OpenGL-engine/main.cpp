@@ -21,7 +21,7 @@
 //tutorial 3 - textures - COMPLETE
 // tutorial 4 - transformations - COMPLETE (tweaked to work with relative linking and 
 // tutorial 5 - Projections and Coordinate Systems - COMPLETE (OpenGL uses right-handed coordinate system)
-// tutorial 6 - 
+// tutorial 6 - Cameras - long one - next
 
 const GLint WIDTH = 1024, HEIGHT = 768;
 
@@ -230,10 +230,10 @@ int main() //rename to main to get to work
 
 		glm::mat4 model;
 		glm::mat4 view;
-		//model = glm::rotate(model, (GLfloat)glfwGetTime() * 1.0f, glm::vec3(0.5f, 1.0f, 0.0f)); //perspective
+		model = glm::rotate(model, (GLfloat)glfwGetTime() * 1.0f, glm::vec3(0.5f, 1.0f, 0.0f)); //perspective
 		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f)); //perspective
 
-		model = glm::rotate(model, 0.5f, glm::vec3(1.0f, 0.0f, 0.0f)); // orthopgrahiic
+		//model = glm::rotate(model, 0.5f, glm::vec3(1.0f, 0.0f, 0.0f)); // orthopgrahiic
 		//view = glm::translate(view, glm::vec3(screenWidth / 2, screenHeight / 2, -700.0f));  // orthopgrahiic
 
 		GLint modelLocation = glGetUniformLocation(ourShader.Program, "model");
@@ -244,9 +244,6 @@ int main() //rename to main to get to work
 		glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, glm::value_ptr(projection));
 
-		glBindVertexArray(VAO);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-		glBindVertexArray(0);
 
 		//glm::mat4 transform;
 		//transform = glm::translate(transform, glm::vec3(0.0f, 0.0f, 0.0f));
@@ -255,6 +252,9 @@ int main() //rename to main to get to work
 		//GLint transformLocation = glGetUniformLocation(ourShader.Program, "transform");
 		//glUniformMatrix4fv(transformLocation, 1, GL_FALSE, glm::value_ptr(transform));
 
+		glBindVertexArray(VAO);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glBindVertexArray(0);
 
 
 		//glBindVertexArray(VAO);
