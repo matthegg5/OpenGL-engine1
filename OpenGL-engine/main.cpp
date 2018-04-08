@@ -25,7 +25,7 @@
 
 const GLint WIDTH = 1024, HEIGHT = 768;
 
-
+//making changes
 int main() //rename to main to get to work
 {
 	glfwInit();
