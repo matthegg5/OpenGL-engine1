@@ -135,6 +135,7 @@
     <None Include="vertexShader.vs" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="shader.h" />
   </ItemGroup>
   <ItemGroup>
