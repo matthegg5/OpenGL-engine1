@@ -131,8 +131,10 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="fragmentShader.fs" />
-    <None Include="vertexShader.vs" />
+    <None Include="lamp.fs" />
+    <None Include="lamp.vs" />
+    <None Include="lighting.fs" />
+    <None Include="lighting.vs" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />

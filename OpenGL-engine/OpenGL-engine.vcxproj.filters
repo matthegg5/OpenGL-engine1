@@ -15,10 +15,16 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="vertexShader.vs">
+    <None Include="lighting.vs">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="fragmentShader.fs">
+    <None Include="lighting.fs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="lamp.fs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="lamp.vs">
       <Filter>Source Files</Filter>
     </None>
   </ItemGroup>

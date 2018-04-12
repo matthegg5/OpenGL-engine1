@@ -28,7 +28,7 @@ const GLint WIDTH = 1366, HEIGHT = 768;
 
 int SCREEN_WIDTH, SCREEN_HEIGHT;
 void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode);
-void ScrollCallback(GLFWwindow *window, double xOffset, double yOffset);
+
 void MouseCallback(GLFWwindow *window, double xPos, double yPos);
 void DoMovement();
 
@@ -41,6 +41,8 @@ bool firstMouse = true;
 
 GLfloat deltaTime = 0.0f;
 GLfloat lastFrame = 0.0f;
+
+glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
 //making changes
 int main() //rename to main to get to work
@@ -68,7 +70,7 @@ int main() //rename to main to get to work
 
 	glfwSetKeyCallback(window, KeyCallback);
 	glfwSetCursorPosCallback(window, MouseCallback);
-	glfwSetScrollCallback(window, ScrollCallback);
+
 	
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); //fix the mouse to the window
 
@@ -96,114 +98,92 @@ int main() //rename to main to get to work
 	glEnable(GL_DEPTH_TEST);
 
 
-	Shader ourShader("vertexShader.vs", "fragmentShader.fs");
+	Shader lampShader("lamp.vs", "lamp.fs");
+	Shader lightingShader("lighting.vs", "lighting.fs");
 
 	// Set up vertex data (and buffer(s)) and attribute pointers
 
 	// use with Perspective Projection
 	
 	GLfloat vertices[] = {
-		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-		0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+		-0.5f, -0.5f, -0.5f, 
+		0.5f, -0.5f, -0.5f,  
+		0.5f,  0.5f, -0.5f,  
+		0.5f,  0.5f, -0.5f,  
+		-0.5f,  0.5f, -0.5f,
+		-0.5f, -0.5f, -0.5f,  
 
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-		0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f, -0.5f,  0.5f, 
+		0.5f, -0.5f,  0.5f, 
+		0.5f,  0.5f,  0.5f, 
+		0.5f,  0.5f,  0.5f,  
+		-0.5f,  0.5f,  0.5f,  
+		-0.5f, -0.5f,  0.5f,  
 
-		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f, 
+		-0.5f,  0.5f, -0.5f,  
+		-0.5f, -0.5f, -0.5f, 
+		-0.5f, -0.5f, -0.5f,  
+		-0.5f, -0.5f,  0.5f,  
+		-0.5f,  0.5f,  0.5f,  
 
-		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		0.5f,  0.5f,  0.5f,  
+		0.5f,  0.5f, -0.5f,  
+		0.5f, -0.5f, -0.5f,  
+		0.5f, -0.5f, -0.5f,  
+		0.5f, -0.5f,  0.5f,  
+		0.5f,  0.5f,  0.5f,  
 
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-		0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  
+		0.5f, -0.5f, -0.5f,  
+		0.5f, -0.5f,  0.5f,  
+		0.5f, -0.5f,  0.5f,  
+		-0.5f, -0.5f,  0.5f,  
+		-0.5f, -0.5f, -0.5f,  
 
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-	};
-
-	glm::vec3 cubePositions[] =
-
-	{
-
-		glm::vec3(0.0f, 0.0f, 0.0f),
-		glm::vec3(2.0f, 5.0f, -15.0f),
-		glm::vec3(-1.5f, -2.2f, -2.5),
-		glm::vec3(-3.8f, -2.0f, -12.3f),
-		glm::vec3(2.4f, -0.4f, -3.5f),
-		glm::vec3(-1.7f, 3.0f, -7.5f),
-		glm::vec3(1.3f, -2.0f, -2.5f),
-		glm::vec3(1.5f, 2.0f, -2.5f),
-		glm::vec3(1.5f, 0.2f, -1.5f),
-		glm::vec3(-1.3f, 1.0f, -1.5f),
-
+		-0.5f,  0.5f, -0.5f, 
+		0.5f,  0.5f, -0.5f,  
+		0.5f,  0.5f,  0.5f,  
+		0.5f,  0.5f,  0.5f,  
+		-0.5f,  0.5f,  0.5f,  
+		-0.5f,  0.5f, -0.5f  
 	};
 
 
-	GLuint VertexBufferObject, VAO;
 
-	glGenVertexArrays(1, &VAO);
+	GLuint VertexBufferObject, boxVAO;
+
+	glGenVertexArrays(1, &boxVAO);
 	glGenBuffers(1, &VertexBufferObject);
 
 
-	glBindVertexArray(VAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VertexBufferObject);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glBindVertexArray(boxVAO);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid *)0);
+	glEnableVertexAttribArray(0);
+
+
+	GLuint  lightVAO;
+
+	glGenVertexArrays(1, &lightVAO);
+	glGenBuffers(1, &VertexBufferObject);
+
+
+	glBindVertexArray(lightVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VertexBufferObject);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid *)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid *)0);
 	glEnableVertexAttribArray(0);
 
 
-	//Texture coordinate attribute
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid *)(3 * sizeof(GL_FLOAT)));
-	glEnableVertexAttribArray(2);
+	glm::mat4 projection = glm::perspective(camera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 1000.0f); //perspective
 
-	GLuint texture;
 
-	int width, height;
-
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	unsigned char *image = SOIL_load_image("bitmap.bmp", &width, &height, 0, SOIL_LOAD_RGBA);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
-	glGenerateMipmap(GL_TEXTURE_2D);
-	SOIL_free_image_data(image);
-	glBindTexture(GL_TEXTURE_2D, 0); //unbind texture
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
 
 	//projection = glm::ortho(0.0f, (GLfloat)SCREEN_WIDTH, 0.0f, (GLfloat)SCREEN_HEIGHT, 0.1f, 1000.0f); //orthographic
 
@@ -223,71 +203,55 @@ int main() //rename to main to get to work
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture);
-		glUniform1i(glGetUniformLocation(ourShader.Program, "ourTexture"), 0);
+		lightingShader.Use();
+		GLint objectColourLoc = glGetUniformLocation(lightingShader.Program, "objectColour");
+		GLint lightColourLoc = glGetUniformLocation(lightingShader.Program, "lightColour");
+		glUniform3f(objectColourLoc, 1.0f, 0.9f, 0.36f);
+		glUniform3f(lightColourLoc, 1.0f, 0.5f, 1.0f);
 
-		ourShader.Use();
-
-		glm::mat4 projection = glm::perspective(camera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 1000.0f); //perspective
-
-
-		//glm::mat4 model;
 		glm::mat4 view;
-		//model = glm::rotate(model, (GLfloat)glfwGetTime() * 1.0f, glm::vec3(0.5f, 1.0f, 0.0f)); //perspective
-		//view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f)); //perspective
-
 		view = camera.GetViewMatrix();
 
-		//model = glm::rotate(model, 0.5f, glm::vec3(1.0f, 0.0f, 0.0f)); // orthopgrahiic
-		//view = glm::translate(view, glm::vec3(screenWidth / 2, screenHeight / 2, -700.0f));  // orthopgrahiic
+		GLint modelLoc = glGetUniformLocation(lightingShader.Program, "model");
+		GLint viewLoc = glGetUniformLocation(lightingShader.Program, "view");
+		GLint projectionLoc = glGetUniformLocation(lightingShader.Program, "projection");
 
-		GLint modelLocation = glGetUniformLocation(ourShader.Program, "model");
-		GLint viewLocation = glGetUniformLocation(ourShader.Program, "view");
-		GLint projectionLocation = glGetUniformLocation(ourShader.Program, "projection");
+		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
-		
-		glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(view));
-		glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, glm::value_ptr(projection));
-
-
-		//glm::mat4 transform;
-		//transform = glm::translate(transform, glm::vec3(0.0f, 0.0f, 0.0f));
-		//transform = glm::rotate(transform, (GLfloat)glfwGetTime() * -0.5f, glm::vec3(0.0f, 0.0f, 1.0f));
-
-		//GLint transformLocation = glGetUniformLocation(ourShader.Program, "transform");
-		//glUniformMatrix4fv(transformLocation, 1, GL_FALSE, glm::value_ptr(transform));
-
-		glBindVertexArray(VAO);
-		
-		for (GLuint i = 0; i < 10; i++)
-		{
-
-			glm::mat4 model;
-			model = glm::translate(model, cubePositions[i]);
-			GLfloat angle = 20.0f * i;
-			model = glm::rotate(model, angle, glm::vec3(1.0f, 0.3f, 0.5f));
-			glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
-
-			
-			glDrawArrays(GL_TRIANGLES, 0, 36);
-
-		}
-		
-		
+		glBindVertexArray(boxVAO);
+		glm::mat4 model;
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		glDrawArrays(GL_TRIANGLES, 0, 36);
 		glBindVertexArray(0);
 
+		lampShader.Use();
 
-		//glBindVertexArray(VAO);
-		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-		//glBindVertexArray(0);
-		//draw stuff here
+
+		 modelLoc = glGetUniformLocation(lampShader.Program, "model");
+		 viewLoc = glGetUniformLocation(lampShader.Program, "view");
+		 projectionLoc = glGetUniformLocation(lampShader.Program, "projection");
+
+		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+
+		model = glm::mat4();
+		model = glm::translate(model, lightPos);
+		model = glm::scale(model, glm::vec3(0.2f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		
+		
+		glBindVertexArray(lightVAO);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glBindVertexArray(0);
+
 
 		glfwSwapBuffers(window);
 
 	}
 
-	glDeleteVertexArrays(1, &VAO);
+	glDeleteVertexArrays(1, &lightVAO);
+	glDeleteVertexArrays(1, &boxVAO);
 	glDeleteBuffers(1, &VertexBufferObject);
 
 	glfwTerminate();
@@ -377,10 +341,4 @@ void MouseCallback(GLFWwindow *window, double xPos, double yPos)
 
 	camera.ProcessMouseMovement(xOffset, yOffset);
 
-}
-
-void ScrollCallback(GLFWwindow *window, double xOffset, double yOffset)
-{
-
-	camera.ProcessMouseScroll(yOffset);
 }
