@@ -132,6 +132,12 @@ public:
 
 	}
 
+	glm::vec3 GetPosition()
+	{
+		return this->position;
+
+	}
+
 	private:
 
 		glm::vec3 position;
