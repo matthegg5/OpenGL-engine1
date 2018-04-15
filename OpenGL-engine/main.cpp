@@ -202,14 +202,20 @@ int main() //rename to main to get to work
 
 	while (!glfwWindowShouldClose(window))
 	{
-		// make the lightPos change per frame (move the light source)
-		//lightPos.x -= 0.01f;
-		//lightPos.z -= 0.01f;
-		//lightPos.y -= 0.01f;
+
+		
 
 		GLfloat currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
+
+		// make the lightPos change per frame (move the light source)
+
+		lightPos.x += 0.01f * cos((float)currentFrame);
+		lightPos.y += 0.01f * sin((float)currentFrame);
+
+		std::cout << currentFrame << std::endl;
+		
 
 		glfwPollEvents();
 
@@ -226,6 +232,8 @@ int main() //rename to main to get to work
 
 		glUniform3f(objectColourLoc, 1.0f, 0.9f, 0.36f);
 		glUniform3f(lightColourLoc, 1.0f, 1.0f, 1.0f);
+
+
 
 		glUniform3f(lightPosLoc, lightPos.x, lightPos.y, lightPos.z);
 		glUniform3f(viewPosLoc, camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
