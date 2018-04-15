@@ -214,7 +214,7 @@ int main() //rename to main to get to work
 		lightPos.x += 0.01f * cos((float)currentFrame);
 		lightPos.y += 0.01f * sin((float)currentFrame);
 
-		std::cout << currentFrame << std::endl;
+		//std::cout << currentFrame << std::endl;
 		
 
 		glfwPollEvents();
@@ -225,13 +225,27 @@ int main() //rename to main to get to work
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		lightingShader.Use();
-		GLint objectColourLoc = glGetUniformLocation(lightingShader.Program, "objectColour");
-		GLint lightColourLoc = glGetUniformLocation(lightingShader.Program, "lightColour");
-		GLint lightPosLoc = glGetUniformLocation(lightingShader.Program, "lightPos");
+		//GLint objectColourLoc = glGetUniformLocation(lightingShader.Program, "objectColour");
+		//GLint lightColourLoc = glGetUniformLocation(lightingShader.Program, "lightColour");
+		GLint lightPosLoc = glGetUniformLocation(lightingShader.Program, "light.position");
 		GLint viewPosLoc = glGetUniformLocation(lightingShader.Program, "viewPos");
 
-		glUniform3f(objectColourLoc, 1.0f, 0.9f, 0.36f);
-		glUniform3f(lightColourLoc, 1.0f, 1.0f, 1.0f);
+		glm::vec3 lightColour;
+		lightColour.r = sin(glfwGetTime() * 2.0f);
+		lightColour.g = sin(glfwGetTime() * 0.7f);
+		lightColour.b = sin(glfwGetTime() * 1.3f);
+
+		glm::vec3 diffuseColour = lightColour * glm::vec3(0.5f);
+		glm::vec3 ambientColour = diffuseColour * glm::vec3(0.2f);
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "light.ambient"), ambientColour.r, ambientColour.g, ambientColour.b);
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "light.diffuse"), diffuseColour.r, diffuseColour.g, diffuseColour.b);
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "light.specular"), 1.0f, 1.0f, 1.0f);
+
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "material.ambient"), 1.0f, 0.5f, 0.31f);
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "material.diffuse"), 1.0f, 0.5f, 0.31f);
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "material.specular"), 0.5f, 0.5f, 0.5f);
+		glUniform1f(glGetUniformLocation(lightingShader.Program, "material.shine"), 32.0f);
+
 
 
 
