@@ -103,7 +103,7 @@ int main() //rename to main to get to work
 	glEnable(GL_DEPTH_TEST);
 
 
-	Shader lampShader("lamp.vs", "lamp.fs");
+	//Shader lampShader("lamp.vs", "lamp.fs");
 	Shader lightingShader("lighting.vs", "lighting.fs");
 
 	// Set up vertex data (and buffer(s)) and attribute pointers
@@ -158,6 +158,20 @@ int main() //rename to main to get to work
 	};
 
 
+	// Positions all containers
+	glm::vec3 cubePositions[] = {
+		glm::vec3(0.0f,   0.0f,   0.0f),
+		glm::vec3(2.0f,   5.0f,   -15.0f),
+		glm::vec3(-1.5f,  -2.2f,  -2.5f),
+		glm::vec3(-3.8f,  -2.0f,  -12.3f),
+		glm::vec3(2.4f,   -0.4f,  -3.5f),
+		glm::vec3(-1.7f,  3.0f,   -7.5f),
+		glm::vec3(1.3f,   -2.0f,  -2.5f),
+		glm::vec3(1.5f,   2.0f,   -2.5f),
+		glm::vec3(1.5f,   0.2f,   -1.5f),
+		glm::vec3(-1.3f,  1.0f,   -1.5f)
+	};
+
 
 	GLuint VertexBufferObject, boxVAO;
 
@@ -185,7 +199,7 @@ int main() //rename to main to get to work
 
 	glBindVertexArray(0); // Unbind boxVAO
 
-	GLuint  lightVAO;
+/*	GLuint  lightVAO;
 
 	glGenVertexArrays(1, &lightVAO);
 	glGenBuffers(1, &VertexBufferObject);
@@ -198,6 +212,9 @@ int main() //rename to main to get to work
 	//position
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)0);
 	glEnableVertexAttribArray(0);
+	glBindVertexArray(0); //Unbind lightVAO
+
+	*/
 
 	GLuint diffuseMap, specularMap;
 	glGenTextures(1, &diffuseMap);
@@ -268,8 +285,11 @@ int main() //rename to main to get to work
 		lightingShader.Use();
 		//GLint objectColourLoc = glGetUniformLocation(lightingShader.Program, "objectColour");
 		//GLint lightColourLoc = glGetUniformLocation(lightingShader.Program, "lightColour");
-		GLint lightPosLoc = glGetUniformLocation(lightingShader.Program, "light.position");
+		//GLint lightPosLoc = glGetUniformLocation(lightingShader.Program, "light.position");
+
+		GLint lightDirectionLocation = glGetUniformLocation(lightingShader.Program, "light.direction");
 		GLint viewPosLoc = glGetUniformLocation(lightingShader.Program, "viewPos");
+		
 
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "light.ambient"), 0.2f, 0.2f, 0.2f);
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "light.diffuse"), 0.5f, 0.5f, 0.5f);
@@ -298,8 +318,8 @@ int main() //rename to main to get to work
 
 
 
-
-		glUniform3f(lightPosLoc, lightPos.x, lightPos.y, lightPos.z);
+		glUniform3f(lightDirectionLocation, -0.2f, 1.0f, -0.3f);
+		//glUniform3f(lightPosLoc, lightPos.x, lightPos.y, lightPos.z);
 		glUniform3f(viewPosLoc, camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
 
 		glm::mat4 view;
@@ -318,16 +338,35 @@ int main() //rename to main to get to work
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, specularMap);
 
-		glBindVertexArray(boxVAO);
 		glm::mat4 model;
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glBindVertexArray(boxVAO);
+
+		for (GLuint i = 0; i < 10; i++)
+		{
+			model = glm::mat4();
+			model = glm::translate(model, cubePositions[i]);
+
+			GLfloat angle = 20.0f * i;
+			model = glm::rotate(model, angle, glm::vec3(1.0f, 0.3f, 0.5f));
+
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+
+		}
+
 		glBindVertexArray(0);
 
-		lampShader.Use();
+		//glBindVertexArray(boxVAO);
+		//glm::mat4 model;
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//glDrawArrays(GL_TRIANGLES, 0, 36);
+		//glBindVertexArray(0);
+
+		//lampShader.Use();
 
 
-		 modelLoc = glGetUniformLocation(lampShader.Program, "model");
+		/* modelLoc = glGetUniformLocation(lampShader.Program, "model");
 		 viewLoc = glGetUniformLocation(lampShader.Program, "view");
 		 projectionLoc = glGetUniformLocation(lampShader.Program, "projection");
 
@@ -343,13 +382,13 @@ int main() //rename to main to get to work
 		glBindVertexArray(lightVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 		glBindVertexArray(0);
-
+*/
 
 		glfwSwapBuffers(window);
 
 	}
 
-	glDeleteVertexArrays(1, &lightVAO);
+	//glDeleteVertexArrays(1, &lightVAO);
 	glDeleteVertexArrays(1, &boxVAO);
 	glDeleteBuffers(1, &VertexBufferObject);
 
