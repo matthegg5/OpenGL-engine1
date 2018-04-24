@@ -144,6 +144,8 @@
     <Image Include="bitmap.bmp">
       <DeploymentContent>true</DeploymentContent>
     </Image>
+    <Image Include="res\container2.png" />
+    <Image Include="res\container2_specular.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
