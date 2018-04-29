@@ -27,7 +27,8 @@
 // tutorial 8 - basic lighting - done
 //tutorial fuck knows - materials - done
 // tutorial 10 - lighting maps - textures nd shit - done
-// tutorial 11 - directional lighting - 
+// tutorial 11 - directional lighting - done
+// tutorial 12 - Point Light - done
 
 const GLint WIDTH = 1366, HEIGHT = 768;
 
@@ -47,7 +48,7 @@ bool firstMouse = true;
 GLfloat deltaTime = 0.0f;
 GLfloat lastFrame = 0.0f;
 
-glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+glm::vec3 lightPos(1.2f, 1.0f, -2.0f);
 
 //making changes
 int main() //rename to main to get to work
@@ -103,7 +104,7 @@ int main() //rename to main to get to work
 	glEnable(GL_DEPTH_TEST);
 
 
-	//Shader lampShader("lamp.vs", "lamp.fs");
+	Shader lampShader("lamp.vs", "lamp.fs");
 	Shader lightingShader("lighting.vs", "lighting.fs");
 
 	// Set up vertex data (and buffer(s)) and attribute pointers
@@ -199,7 +200,7 @@ int main() //rename to main to get to work
 
 	glBindVertexArray(0); // Unbind boxVAO
 
-/*	GLuint  lightVAO;
+	GLuint  lightVAO;
 
 	glGenVertexArrays(1, &lightVAO);
 	glGenBuffers(1, &VertexBufferObject);
@@ -214,11 +215,12 @@ int main() //rename to main to get to work
 	glEnableVertexAttribArray(0);
 	glBindVertexArray(0); //Unbind lightVAO
 
-	*/
+	
 
-	GLuint diffuseMap, specularMap;
+	GLuint diffuseMap, specularMap, emissionMap;
 	glGenTextures(1, &diffuseMap);
 	glGenTextures(1, &specularMap);
+	glGenTextures(1, &emissionMap);
 
 	int textureWidth, textureHeight;
 	unsigned char *image;
@@ -285,7 +287,7 @@ int main() //rename to main to get to work
 		lightingShader.Use();
 		//GLint objectColourLoc = glGetUniformLocation(lightingShader.Program, "objectColour");
 		//GLint lightColourLoc = glGetUniformLocation(lightingShader.Program, "lightColour");
-		//GLint lightPosLoc = glGetUniformLocation(lightingShader.Program, "light.position");
+		GLint lightPosLoc = glGetUniformLocation(lightingShader.Program, "light.position");
 
 		GLint lightDirectionLocation = glGetUniformLocation(lightingShader.Program, "light.direction");
 		GLint viewPosLoc = glGetUniformLocation(lightingShader.Program, "viewPos");
@@ -294,6 +296,9 @@ int main() //rename to main to get to work
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "light.ambient"), 0.2f, 0.2f, 0.2f);
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "light.diffuse"), 0.5f, 0.5f, 0.5f);
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "light.specular"), 1.0f, 1.0f, 1.0f);
+		glUniform1f(glGetUniformLocation(lightingShader.Program, "light.constant"), 1.0f);
+		glUniform1f(glGetUniformLocation(lightingShader.Program, "light.linear"), 0.09f);
+		glUniform1f(glGetUniformLocation(lightingShader.Program, "light.quadratic"), 0.02f);
 		
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "material.shine"), 32.0f);
 
@@ -318,8 +323,8 @@ int main() //rename to main to get to work
 
 
 
-		glUniform3f(lightDirectionLocation, -0.2f, 1.0f, -0.3f);
-		//glUniform3f(lightPosLoc, lightPos.x, lightPos.y, lightPos.z);
+		//glUniform3f(lightDirectionLocation, -0.2f, 1.0f, -0.3f);
+		glUniform3f(lightPosLoc, lightPos.x, lightPos.y, lightPos.z);
 		glUniform3f(viewPosLoc, camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
 
 		glm::mat4 view;
@@ -363,10 +368,10 @@ int main() //rename to main to get to work
 		//glDrawArrays(GL_TRIANGLES, 0, 36);
 		//glBindVertexArray(0);
 
-		//lampShader.Use();
+		lampShader.Use();
 
 
-		/* modelLoc = glGetUniformLocation(lampShader.Program, "model");
+		 modelLoc = glGetUniformLocation(lampShader.Program, "model");
 		 viewLoc = glGetUniformLocation(lampShader.Program, "view");
 		 projectionLoc = glGetUniformLocation(lampShader.Program, "projection");
 
@@ -382,13 +387,13 @@ int main() //rename to main to get to work
 		glBindVertexArray(lightVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 		glBindVertexArray(0);
-*/
+
 
 		glfwSwapBuffers(window);
 
 	}
 
-	//glDeleteVertexArrays(1, &lightVAO);
+	glDeleteVertexArrays(1, &lightVAO);
 	glDeleteVertexArrays(1, &boxVAO);
 	glDeleteBuffers(1, &VertexBufferObject);
 
