@@ -25,7 +25,7 @@
 // tutorial 6 - Cameras - done
 // tutorial 7 - colours - done
 // tutorial 8 - basic lighting - done
-//tutorial fuck knows - materials - done
+//tutorial 9 - materials - done
 // tutorial 10 - lighting maps - textures nd shit - done
 // tutorial 11 - directional lighting - done
 // tutorial 12 - Point Light - done
@@ -298,12 +298,7 @@ int main() //rename to main to get to work
 		glUniform3f(viewPosLoc, camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
 		// Set material properties
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "material.shininess"), 32.0f);
-		// == ==========================
-		// Here we set all the uniforms for the 5/6 types of lights we have. We have to set them manually and index
-		// the proper PointLight struct in the array to set each uniform variable. This can be done more code-friendly
-		// by defining light types as classes and set their values in there, or by using a more efficient uniform approach
-		// by using 'Uniform buffer objects', but that is something we discuss in the 'Advanced GLSL' tutorial.
-		// == ==========================
+
 		// Directional light
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "dirLight.direction"), -0.2f, -1.0f, -0.3f);
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "dirLight.ambient"), 0.05f, 0.05f, 0.05f);
@@ -382,21 +377,21 @@ int main() //rename to main to get to work
 
 
 
-		//glm::vec3 lightColour;
-		//lightColour.r = sin(glfwGetTime() * 2.0f);
-		//lightColour.g = sin(glfwGetTime() * 0.7f);
-		//lightColour.b = sin(glfwGetTime() * 1.3f);
+		glm::vec3 lightColour;
+		lightColour.r = sin(glfwGetTime() * 2.0f);
+		lightColour.g = sin(glfwGetTime() * 0.7f);
+		lightColour.b = sin(glfwGetTime() * 1.3f);
 
-		//glm::vec3 diffuseColour = lightColour * glm::vec3(0.5f);
-		//glm::vec3 ambientColour = diffuseColour * glm::vec3(0.2f);
-		//glUniform3f(glGetUniformLocation(lightingShader.Program, "light.ambient"), ambientColour.r, ambientColour.g, ambientColour.b);
-		//glUniform3f(glGetUniformLocation(lightingShader.Program, "light.diffuse"), diffuseColour.r, diffuseColour.g, diffuseColour.b);
-		//glUniform3f(glGetUniformLocation(lightingShader.Program, "light.specular"), 1.0f, 1.0f, 1.0f);
+		glm::vec3 diffuseColour = lightColour * glm::vec3(0.5f);
+		glm::vec3 ambientColour = diffuseColour * glm::vec3(0.2f);
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "light.ambient"), ambientColour.r, ambientColour.g, ambientColour.b);
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "light.diffuse"), diffuseColour.r, diffuseColour.g, diffuseColour.b);
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "light.specular"), 1.0f, 1.0f, 1.0f);
 
-		//glUniform3f(glGetUniformLocation(lightingShader.Program, "material.ambient"), 1.0f, 0.5f, 0.31f);
-		//glUniform3f(glGetUniformLocation(lightingShader.Program, "material.diffuse"), 1.0f, 0.5f, 0.31f);
-		//glUniform3f(glGetUniformLocation(lightingShader.Program, "material.specular"), 0.5f, 0.5f, 0.5f);
-		//glUniform1f(glGetUniformLocation(lightingShader.Program, "material.shine"), 32.0f);
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "material.ambient"), 1.0f, 0.5f, 0.31f);
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "material.diffuse"), 1.0f, 0.5f, 0.31f);
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "material.specular"), 0.5f, 0.5f, 0.5f);
+		glUniform1f(glGetUniformLocation(lightingShader.Program, "material.shine"), 32.0f);
 
 		
 		glUniform3f(lightPosLoc, camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
